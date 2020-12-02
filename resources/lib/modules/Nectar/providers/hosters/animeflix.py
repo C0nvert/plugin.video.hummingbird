@@ -11,6 +11,7 @@
 
 import requests
 import json
+import urllib
 
 import math
 
@@ -43,7 +44,7 @@ class source:
         
         for a in info:
             for b in titles:
-                if a['title'] == titles[b] or a['english_title'] == titles[b]:
+                if a['title'] == titles[b]:
                     correctItem = a
         
         show_id = correctItem['id']
@@ -63,7 +64,8 @@ class source:
                 ep_id = a['id']
         
         source_link = self.base_link + self.api_embed % ep_id
-        
+        print("THE LINK IS ANIMEFLIX: ")
+        print(source_link)
         return source_link
         
     def movie(self, data):
@@ -102,14 +104,19 @@ class source:
                 adaptive = 'hls'
             elif a['type'] == 'dash':
                 adaptive = 'mpd'
-                
-            source = {'site': 'AnimeFlix',
-                      'source': a['provider'],
-                      'link': a['file'],
-                      'quality': int(str(a['resolution']).split('p')[0]),
-                      'audio_type': a['lang'].title(),
-                      'adaptive': adaptive,
-                      'subtitles': None}                          
-            sources.append(source)
-        
-        return sources            
+            
+            corrected_source= a['file']
+            corrected_source=corrected_source.split('/',4)
+            corrected_source=urllib.unquote(corrected_source[4])
+            if a['provider'] =='FastStream' and a['type'] == 'hls' and a['hardsub'] == True:
+                source = {'site': 'AnimeFlix',
+                        'source': a['provider'],
+                        'link': corrected_source,
+                        'quality': int(str(a['resolution']).split('p')[0]),
+                        'audio_type': a['lang'].title(),
+                        'adaptive': adaptive,
+                        'subtitles': None}                          
+                sources.append(source)
+            print("ANIMEFLIX SOURCES NOW:")
+            print(sources)
+            return sources            
