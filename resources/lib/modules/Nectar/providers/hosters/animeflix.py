@@ -1,13 +1,14 @@
 # -*- coding: UTF-8 -*-
 
 #Coded by Wilson Magic for the Hummingbird addon
+#Added fix by C0nvert
 #Based on the Exodus standard but is incompatible with other scrapers without modification
 
 #Scraper: AnimeFlix
 #Site: animeflix.io
 
 #Creation Date: 30/08/2019
-#Last Update: 01/09/2019
+#Last Update: 02/12/2020
 
 import requests
 import json
@@ -64,8 +65,8 @@ class source:
                 ep_id = a['id']
         
         source_link = self.base_link + self.api_embed % ep_id
-        print("THE LINK IS ANIMEFLIX: ")
-        print(source_link)
+        
+        
         return source_link
         
     def movie(self, data):
@@ -105,9 +106,17 @@ class source:
             elif a['type'] == 'dash':
                 adaptive = 'mpd'
             
+            #FastStream Server is using a Crunchyroll Stream with a (non working?) Proxy Server in front of the encoded Stream Link.
+            #Stream link get stripped and corrected
+            
             corrected_source= a['file']
             corrected_source=corrected_source.split('/',4)
             corrected_source=urllib.unquote(corrected_source[4])
+            
+            #AUEngine seems not to work anymore. FastStream will be used instead.
+            #Only HLS is working.
+            #Why is dash not working....? Needs further digging.
+            
             if a['provider'] =='FastStream' and a['type'] == 'hls' and a['hardsub'] == True:
                 source = {'site': 'AnimeFlix',
                         'source': a['provider'],
@@ -117,6 +126,6 @@ class source:
                         'adaptive': adaptive,
                         'subtitles': None}                          
                 sources.append(source)
-            print("ANIMEFLIX SOURCES NOW:")
-            print(sources)
+            
+            
             return sources            
