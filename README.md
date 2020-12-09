@@ -6,7 +6,7 @@ Fork from Wilson-Magic
 
 #### Fixed:
 ```
- AnimeFlix, changed AUEngine to FastStream. As it seems AUEngine is not working anymore.
+ AnimeFlix, changed AUEngine to FastStream.
 ```
 #### Added:
 ```
