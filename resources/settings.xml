@@ -67,12 +67,9 @@
     </category>
     <category label="Scrapers">
         <setting type="lsep" label="Hosters"/>
-            <setting type="bool" id="animefever" label="AnimeFever" default="true"/>
+            <setting type="bool" id="gogoanime" label="GogoAnime" default="true"/>
             <setting type="bool" id="animeflix" label="AnimeFlix" default="true"/>
-            <setting type="bool" id="animepahe" label="AnimePahe" default="true"/>
             <setting type="bool" id="animetwist" label="AnimeTwist" default="true"/>
-            <setting type="bool" id="saiko" label="Saiko" default="true"/>
-            <setting type="bool" id="wonderfulsubs" label="WonderfulSubs" default="true"/>
     </category>
     <category label="Menu Sorting">
         <setting type="lsep" label="Menu"/>
