@@ -2,6 +2,8 @@
 Anime kodi addon.
 Fork from Wilson-Magic
 
+### Version 0.6.0
+
 #### Fixed:
 ```
  AnimeFlix, changed AUEngine to FastStream. As it seems AUEngine is not working anymore.
