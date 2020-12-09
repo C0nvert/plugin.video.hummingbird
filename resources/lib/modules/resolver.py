@@ -27,6 +27,8 @@ class Resolver:
             self.twist_resolver(link['link'])
         elif 'AnimeFlix' in link['site']:
             self.direct_resolve(link['link'])
+        elif 'GogoAnime' in link['site']:
+            self.gogoanime_resolve(link['link'])
         elif '4Anime' in link['site']:
             self.fourAnime_resolver(link['link'])
         else:
@@ -40,8 +42,34 @@ class Resolver:
         return response    
         
     def direct_resolve(self, link):
-        self.resolved_link = link   
+        self.resolved_link = link 
     
+    def gogoanime_resolve(self,link):
+        
+        if 'gogo-play.net/streaming' in link:
+            r1= re.findall(r'(?://|\.)(gogo-play\.net)/(?:streaming|embed|load)\.php\?id=([a-zA-Z0-9]+)',link)
+            link='https://%s/ajax.php?id=%s' % (r1[0][0],r1[0][1])
+            scraper = cfscrape.create_scraper()
+            resp = scraper.get(link)
+            load = json.loads(resp.content)
+            resolved_Stream=''
+            resolved_Stream=load['source'][0]['file']
+            self.resolved_link = resolved_Stream
+
+        elif 'cloud9' in link:
+            link=link.replace('https://cloud9.to/embed/', 'https://api.cloud9.to/stream/')
+            #create cloudflare scraper, save resp and use json
+            scraper = cfscrape.create_scraper()
+            resp = scraper.get(link)
+            load = json.loads(resp.content)
+            resolved_Stream=''
+
+            #search for resolved HD Stream
+            for a in range(len(load['data']['sources'])):
+                if load['data']['sources'][a]['label'] == 'HD' or load['data']['sources'][a]['label'] == 'FHD':
+                    resolved_Stream=load['data']['sources'][a]['file']
+            self.resolved_link = resolved_Stream
+
     def fourAnime_resolver(self, link):
         servers = ['https://v1.', 'https://v2.', 'https://v3.', 'https://v4.', 'https://v5.', 'https://v6.', 'https://v7.']
         
@@ -63,10 +91,15 @@ class Resolver:
         scraper = cfscrape.create_scraper()
         download_url = link.replace('kwik.cx/e/', 'kwik.cx/f/')
         kwik_text = scraper.get(download_url, headers={'referer': download_url}).content
-        post_url = re.findall(r'action="(.*?)"', kwik_text)[0]
-        token = re.findall(r'value="(.*?)"', kwik_text)[0]
-        stream_url = scraper.post(post_url, headers={'referer': download_url}, data={'_token': token}, allow_redirects=False).headers['Location']
-        self.resolved_link = stream_url
+        post_url = re.findall(r'action="(.*?)"', kwik_text)
+        token = re.findall(r'value="(.*?)"', kwik_text)
+        if len(post_url) > 0 and len(token) > 0:
+            stream_url = scraper.post(post_url[0], headers={'referer': download_url}, data={'_token': token[0]}, allow_redirects=False).headers['Location']
+            self.resolved_link = stream_url
+        elif len(post_url) == 0:
+            tools.log('Error - No action in kwik scraped url: ' + kwik_text, 'error')
+        elif len(token) == 0:
+            tools.log('Error - No token in kwik scaped url:' + kwik_text, 'error')
     
     def twist_resolver(self, link):
         #Setup
